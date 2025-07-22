@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - Jeyvanth Silks</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        background: #fff7f0;
+        color: #333;
+      }
+      .nav-icons {
+        position: relative;
+      }
+
+      .nav-icons a span {
+        position: absolute;
+        top: -8px;
+        right: -12px;
+        background-color: #8b0000;
+        color: white;
+        font-size: 12px;
+        padding: 2px 6px;
+        border-radius: 50%;
+      }
+
+      .checkout-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        padding: 0 20px;
+      }
+
+      h2 {
+        color: #8b0000;
+        margin-bottom: 20px;
+      }
+
+      .summary,
+      .billing-form {
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      }
+
+      .cart-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+
+      .cart-item img {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        margin-right: 10px;
+      }
+
+      .item-info {
+        flex: 1;
+      }
+
+      .total {
+        text-align: right;
+        margin-top: 15px;
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      form input,
+      form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+
+      .checkout-btn {
+        width: 100%;
+        padding: 12px;
+        background: #8b0000;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1.1rem;
+        cursor: pointer;
+      }
+
+      .checkout-btn:hover {
+        background: #a31515;
+      }
+      .checkout-container #total {
+        color: bold black;
+        margin-bottom: 15px;
+        display: inline-block;
+        font-size: 18px;
+      }
+
+      @media (max-width: 768px) {
+        .checkout-container {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container header-container">
+        <h1>JeyvanthSilks</h1>
+        <!-- <a href="index.html" class="logo">
+                <img src="assets/logo.png" alt="Jeyvanth Silks" width="180" />
+            </a> -->
+
+        <nav id="navbar">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="index.html#about">About</a></li>
+
+            <li><a href="index.html#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="nav-icons">
+          <a href="cart.html"
+            ><i class="fas fa-shopping-bag"></i><span>0</span></a
+          >
+          <button class="mobile-menu-btn" id="menu-btn">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="checkout-container">
+      <!-- Order Summary -->
+      <div class="summary">
+        <h2>Order Summary</h2>
+        <p id="total">Total Items: <span id="total-items">0</span></p>
+        <!-- ✅ New line -->
+        <div id="checkout-items"></div>
+        <div class="total">Total: ₹<span id="checkout-total">0</span></div>
+      </div>
+
+      <!-- Billing Form -->
+      <div class="billing-form">
+        <h2>Billing Details</h2>
+        <form id="checkout-form">
+          <input type="text" id="name" placeholder="Full Name" required />
+          <input type="email" id="email" placeholder="Email Address" required />
+          <input type="tel" id="phone" placeholder="Phone Number" required />
+          <textarea
+            id="address"
+            placeholder="Shipping Address"
+            rows="4"
+            required
+          ></textarea>
+          <button type="submit" class="checkout-btn">Place Order</button>
+        </form>
+      </div>
+    </section>
+
+    <script>
+      //✅ EmailJS init
+      emailjs.init("3TlZpZi2j-IhjsCGW"); // Your public key
+
+      const checkoutItems = document.getElementById("checkout-items");
+      const checkoutTotal = document.getElementById("checkout-total");
+      const totalItemsDisplay = document.getElementById("total-items");
+
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      let total = 0;
+      let totalItems = 0;
+
+      function loadCart() {
+        checkoutItems.innerHTML = "";
+        total = 0;
+        totalItems = 0;
+
+        if (cart.length === 0) {
+          checkoutItems.innerHTML = "<p>Your cart is empty 🛍️</p>";
+          checkoutTotal.textContent = "0";
+          totalItemsDisplay.textContent = "0";
+          return;
+        }
+
+        cart.forEach((item) => {
+          const quantity = item.quantity || 1;
+          const price = item.price * quantity;
+          total += price;
+          totalItems += quantity;
+
+          const itemDiv = document.createElement("div");
+          itemDiv.className = "cart-item";
+          itemDiv.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <div class="item-info">
+          <h4>${item.name} (x${quantity})</h4>
+          <p>₹${price}</p>
+        </div>
+      `;
+          checkoutItems.appendChild(itemDiv);
+        });
+
+        checkoutTotal.textContent = total;
+        totalItemsDisplay.textContent = totalItems;
+      }
+
+      function orderNow() {
+        if (cart.length === 0) {
+          alert("Your cart is empty!");
+          return;
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const address = document.getElementById("address").value.trim();
+
+        if (!name || !email || !phone || !address) {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        const totalCost = cart.reduce(
+          (sum, item) => sum + (parseInt(item.price) || 0),
+          0
+        );
+        const shippingCost = 50;
+        const taxCost = 25;
+        const grandTotal = totalCost + shippingCost + taxCost;
+
+        const orderItems = cart.map((item) => {
+          return {
+            name: item.name || "Unnamed",
+            price: item.price || "0",
+            units: "1",
+            image_url: item.image || "https://via.placeholder.com/100",
+          };
+        });
+        console.log(orderItems);
+
+        const orderDetails = {
+          email: email,
+          order_id: "ORD" + Math.floor(Math.random() * 100000),
+          orders: orderItems,
+          cost: {
+            shipping: shippingCost,
+            tax: taxCost,
+            total: "₹" + grandTotal,
+          },
+        };
+        console.log(orderDetails);
+        emailjs
+          .send("service_79e6adh", "template_kp9u7xe", orderDetails)
+          .then(() => {
+            alert("✅ Order confirmation sent to email!");
+            localStorage.removeItem("cart");
+            cart = [];
+            loadCart();
+            document.getElementById("checkout-form").reset();
+          })
+          .catch((err) => {
+            alert("❌ Failed to send email.");
+            console.error("Email send failed:", err);
+          });
+      }
+
+      // ✅ Form submit triggers orderNow()
+      document
+        .getElementById("checkout-form")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+          orderNow();
+        });
+
+      // ✅ Cart count on top nav
+      function updateCartCount() {
+        const cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const countElement = document.querySelector(".fa-shopping-bag + span");
+        if (countElement) {
+          const totalItems = cart.reduce(
+            (sum, item) => sum + (item.quantity || 1),
+            0
+          );
+          countElement.textContent = totalItems;
+        }
+      }
+
+      loadCart();
+      updateCartCount();
+    </script>
+  </body>
+</html>
+
+
+
+<!-- public key 3TlZpZi2j-IhjsCGW
+// template id template_kp9u7xe
+// service id service_79e6adh -->

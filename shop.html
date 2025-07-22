@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop - Jeyvanth Silks</title>
+
+    <!-- Fonts & Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <!-- Header -->
+    <header>
+      <div class="container header-container">
+        <h1>JeyvanthSilks</h1>
+        <!-- <a href="index.html" class="logo">
+          <img src="assets/logo.png" alt="Jeyvanth Silks" width="180" />
+        </a> -->
+        <nav id="navbar">
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li class="dropdown">
+              <a href="#">Collections <i class="fas fa-chevron-down"></i></a>
+              <ul class="dropdown-menu">
+                <li><a href="shop.html?category=men">Men</a></li>
+                <li><a href="shop.html?category=women">Women</a></li>
+                <li><a href="shop.html?category=kidgirls">Kid Girls</a></li>
+                <li><a href="shop.html?category=kidboys">Kid Boys</a></li>
+              </ul>
+            </li>
+            <li><a href="index.html#about">About</a></li>
+            <li><a href="index.html#contact">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="nav-icons">
+          <a href="#"><i class="fas fa-search"></i></a>
+          <a href="#"><i class="fas fa-user"></i></a>
+          <a href="#"><i class="fas fa-heart"></i></a>
+          <a href="cart.html"
+            ><i class="fas fa-shopping-bag"></i><span>0</span></a
+          >
+          <button class="mobile-menu-btn" id="menu-btn">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Cart Popup -->
+    <div id="cart-popup">Product added to cart!</div>
+
+    <!-- Shop Section -->
+    <section class="shop-section">
+      <div class="container shop-content">
+        <!-- Products -->
+        <main class="shop-products products-grid" id="products-container">
+          <!-- JS will insert product cards here -->
+        </main>
+
+        <!-- Filters -->
+        <aside class="shop-filters">
+          <div class="filter-section">
+            <h3>Price Range</h3>
+            <input
+              type="range"
+              id="price-range"
+              min="0"
+              max="10000"
+              step="100"
+              value="10000"
+            />
+            <div class="price-values">
+              <span>0</span>
+              <span id="max-price-display">₹10000</span>
+            </div>
+          </div>
+
+          <div class="filter-section">
+            <h3>Gender</h3>
+            <div class="gender-filters">
+              <label
+                ><input
+                  type="checkbox"
+                  class="gender-filter"
+                  value="men"
+                  checked
+                />
+                Men</label
+              >
+              <label
+                ><input
+                  type="checkbox"
+                  class="gender-filter"
+                  value="women"
+                  checked
+                />
+                Women</label
+              >
+              <label
+                ><input
+                  type="checkbox"
+                  class="gender-filter"
+                  value="kidgirls"
+                  checked
+                />
+                Kid Girls</label
+              >
+              <label
+                ><input
+                  type="checkbox"
+                  class="gender-filter"
+                  value="kidboys"
+                  checked
+                />
+                Kid Boys</label
+              >
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-bottom">
+          <p>&copy; 2025 Jeyvanth Silks. All Rights Reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts (correct order matters) -->
+    <script src="data.js"></script>
+    <script>
+  // Force update every time page loads
+  localStorage.setItem("allProducts", JSON.stringify(products));
+</script>
+
+    <script src="script.js"></script>
+  </body>
+</html>

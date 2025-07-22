@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cart - Jeyvanth Silks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      background: #fff7f0;
+      color: #333;
+    }
+    .cart-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    h2 {
+      color: #8B0000;
+      margin-bottom: 30px;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      flex-wrap: wrap;
+    }
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    .item-info {
+      flex: 2;
+      margin-left: 20px;
+    }
+    .item-info h4 {
+      margin: 0 0 5px;
+      font-size: 1rem;
+    }
+    .item-info p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quantity-controls button {
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 5px;
+      background: #8B0000;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .item-actions {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .item-actions button.remove-btn {
+      padding: 5px 10px;
+      background: #8B0000;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .cart-summary {
+      text-align: right;
+      margin-top: 30px;
+    }
+    .cart-summary h3 {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+    .checkout-btn {
+      padding: 10px 20px;
+      background: #009966;
+      color: #fff;
+      font-weight: 500;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .fa-shopping-bag {
+      position: relative;
+    }
+    .cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: #8B0000;
+  color: white;
+  font-size: 0.7rem;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 50%;
+  font-weight: bold;
+}
+.checkout-btn {
+  display: inline-block;
+  text-align: center;
+  background-color: #8B0000;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.checkout-btn:hover {
+  background-color: #a31515;
+}
+.continue-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  color: #333;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  transition: background 0.3s ease;
+}
+
+.continue-btn:hover {
+  background-color: #ddd;
+}
+
+
+
+    
+    @media (max-width: 600px) {
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .item-actions {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container header-container">
+      <h1>JeyvanthSilks</h1>
+      <!-- <a href="index.html" class="logo">
+        <img src="assets/logo.png" alt="Jeyvanth Silks" width="180">
+      </a> -->
+      <nav id="navbar">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="shop.html">Shop</a></li>
+                            <li><a href="index.html#about">About</a></li>
+
+         <li><a href="index.html#contact">Contact</a></li>
+
+          <li>
+            <a href="cart.html">
+              <i class="fas fa-shopping-bag"></i><span class="cart-count">0</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Cart Section -->
+  <section class="cart-container">
+    <h2>Your Shopping Cart</h2>
+    <div id="cart-items"></div>
+    <div class="cart-summary">
+      <h3>Total: ₹<span id="cart-total">0</span></h3>
+      <div class="cart-summary">
+  <a href="checkout.html" class="checkout-btn">Proceed to Checkout</a>
+  <a href="shop.html" class="continue-btn">Continue Shopping</a>
+
+</div>
+
+    </div>
+  </section>
+
+  <!-- Scripts -->
+  <script>
+    const cartItemsContainer = document.getElementById("cart-items");
+    const cartTotal = document.getElementById("cart-total");
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+console.log(cart);
+
+    function updateCart() {
+      cartItemsContainer.innerHTML = "";
+      let total = 0;
+
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = "<p>Your cart is empty.</p>";
+        cartTotal.textContent = "0";
+        updateCartCount();
+        return;
+      }
+
+      cart.forEach((item, index) => {
+        total += item.price * (item.quantity || 1);
+
+        const div = document.createElement("div");
+        div.classList.add("cart-item");
+        div.innerHTML = `
+          <img src="${item.image}" alt="${item.name}">
+          <div class="item-info">
+            <h4>${item.name} (x${item.quantity || 1})</h4>
+            <p>₹${item.price} x <span id="qty-${index}">${item.quantity || 1}</span></p>
+            <div class="quantity-controls">
+              <button onclick="decreaseQty(${index})">-</button>
+              <button onclick="increaseQty(${index})">+</button>
+            </div>
+          </div>
+          <div class="item-actions">
+            <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
+          </div>
+        `;
+        cartItemsContainer.appendChild(div);
+      });
+
+      cartTotal.textContent = total;
+      updateCartCount();
+    }
+
+    function increaseQty(index) {
+      if (!cart[index].quantity) cart[index].quantity = 1;
+      cart[index].quantity++;
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCart();
+    }
+
+    function decreaseQty(index) {
+      if (!cart[index].quantity) cart[index].quantity = 1;
+      if (cart[index].quantity > 1) {
+        cart[index].quantity--;
+        localStorage.setItem("cart", JSON.stringify(cart));
+        updateCart();
+      }
+    }
+
+    function removeItem(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCart();
+    }
+
+    function updateCartCount() {
+      const countElement = document.querySelector(".cart-count");
+      const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+      if (countElement) {
+        countElement.textContent = totalItems;
+      }
+    }
+
+    updateCart();
+  </script>
+</body>
+</html>

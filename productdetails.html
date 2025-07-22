@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - Jeyvanth Silks</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .stars {
+      font-size: 1.5rem;
+      color: #ccc;
+      cursor: pointer;
+    }
+
+    .stars .selected {
+      color: #FFD700;
+    }
+
+    #review-text {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .rating-section {
+      background: #fff;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .review {
+      padding: 10px;
+      background: #f9f9f9;
+      border-left: 4px solid #8B0000;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+    .related-item img {
+  width: 100%;
+  height: 180px; /* Fixed height */
+  object-fit: cover; /* Maintain aspect ratio without stretching */
+  border-radius: 6px;
+}
+.related-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 300px;
+}
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container header-container">
+      <h1>JeyvanthSilks</h1>
+      <!-- <a href="index.html" class="logo">
+        <img src="assets/logo.png" alt="Jeyvanth Silks" width="180" />
+      </a> -->
+      <nav id="navbar">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="shop.html">Shop</a></li>
+          <li class="dropdown">
+            <a href="#">Collections <i class="fas fa-chevron-down"></i></a>
+            <ul class="dropdown-menu">
+              <li><a href="shop.html?category=men">Men</a></li>
+              <li><a href="shop.html?category=women">Women</a></li>
+              <li><a href="shop.html?category=kidgirls">Kid Girls</a></li>
+              <li><a href="shop.html?category=kidboys">Kid Boys</a></li>
+            </ul>
+          </li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+
+        </ul>
+      </nav>
+      <div class="nav-icons">
+        <a href="#"><i class="fas fa-search"></i></a>
+        <a href="#"><i class="fas fa-user"></i></a>
+        <a href="#"><i class="fas fa-heart"></i></a>
+        <a href="cart.html" class="cart-icon">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-count">0</span>
+        </a>
+
+        <button class="mobile-menu-btn" id="menu-btn"><i class="fas fa-bars"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <div id="cart-popup">Product added to cart!</div>
+  <div id="product-details-container" class="product-detail-container"></div>
+
+
+
+
+
+<script>
+  const container = document.getElementById('product-details-container');
+  const selectedProduct = JSON.parse(localStorage.getItem('selectedProduct'));
+  const popup = document.getElementById('cart-popup');
+
+  if (selectedProduct) {
+    const product = selectedProduct;
+    let related = [];
+
+    const allProducts = JSON.parse(localStorage.getItem("allProducts")) || [];
+    if (allProducts.length) {
+      related = allProducts.filter(p => p.gender === product.gender && p.name !== product.name);
+      if (related.length < 4) {
+        related = allProducts.filter(p => p.name !== product.name).slice(0, 4);
+      }
+    }
+
+    // Product details & related items render
+    container.innerHTML = `
+      <div class="product-detail-card">
+        <img src="${product.image}" alt="${product.name}" class="detail-image" />
+        <div class="detail-info">
+          <h2>${product.name}</h2>
+          <p><strong>Category:</strong> ${product.category}</p>
+          <p class="price">Price: ₹${product.price}</p>
+          <p>Description: This is a high-quality ${product.category} tailored to perfection. Ideal for festive occasions and daily wear.</p>
+          <button class="btn" id="add-to-cart">Add to Cart</button>
+          <button class="btn" id="order-now">Order Now</button>
+          <a href="shop.html" class="btn btn-secondary">Back to Shop</a>
+        </div>
+      </div>
+
+      <div class="rating-section">
+        <h3>Rate this Product</h3>
+        <div id="star-rating" class="stars">
+          <span data-value="1">★</span>
+          <span data-value="2">★</span>
+          <span data-value="3">★</span>
+          <span data-value="4">★</span>
+          <span data-value="5">★</span>
+        </div>
+        <textarea id="review-text" placeholder="Write your review..."></textarea>
+        <button class="btn" id="submit-review">Submit Review</button>
+        <div id="reviews-list"></div>
+      </div>
+
+      <div class="related-products">
+        <h3>Related Products</h3>
+        <div class="related-list">
+          ${related.map(item => `
+            <div class="related-item" data-index="${allProducts.indexOf(item)}">
+              <img src="${item.image}" alt="${item.name}" />
+              <h4>${item.name}</h4>
+              <p>₹${item.price}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    // ✅ Add to Cart
+    // ✅ Add to Cart (prevent duplicate)
+document.getElementById('add-to-cart').addEventListener('click', () => {
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  const existingItem = cart.find(item => item.name === product.name);
+  if (existingItem) {
+    existingItem.quantity = (existingItem.quantity || 1) + 1;
+  } else {
+    cart.push({
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1
+    });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+
+  popup.textContent = `${product.name} added to cart!`;
+  popup.style.display = 'block';
+  setTimeout(() => popup.style.display = 'none', 2000);
+});
+
+
+
+    // ✅ Order Now
+    document.getElementById('order-now').addEventListener('click', () => {
+      const email = prompt("Enter your email to receive order confirmation:");
+      if (email) {
+        alert(`Order placed for ${product.name}. Confirmation sent to ${email}.`);
+      } else {
+        alert("Order cancelled. Email required.");
+      }
+    });
+
+    // ✅ Cart Count
+    function updateCartCount() {
+  const cart = JSON.parse(localStorage.getItem("cart")) || [];
+  const countElement = document.querySelector(".fa-shopping-bag + span");
+  if (countElement) {
+    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    countElement.textContent = totalItems;
+  }
+}
+
+    updateCartCount();
+
+    // ✅ Star Rating System
+    let currentRating = 0;
+    const stars = Array.from(document.querySelectorAll("#star-rating span"));
+
+    stars.forEach((star, index) => {
+      star.addEventListener("click", () => {
+        currentRating = index + 1;
+        stars.forEach((s, i) => s.classList.toggle("selected", i < currentRating));
+      });
+
+      star.addEventListener("mouseover", () => {
+        stars.forEach((s, i) => s.classList.toggle("hover", i <= index));
+      });
+
+      star.addEventListener("mouseout", () => {
+        stars.forEach(s => s.classList.remove("hover"));
+      });
+    });
+
+    // ✅ Submit Review
+    document.getElementById("submit-review").addEventListener("click", () => {
+      const text = document.getElementById("review-text").value.trim();
+      if (currentRating === 0 || !text) return alert("Please rate and write a review.");
+      const reviews = JSON.parse(localStorage.getItem(`${product.name}_reviews`)) || [];
+      reviews.push({ rating: currentRating, comment: text });
+      localStorage.setItem(`${product.name}_reviews`, JSON.stringify(reviews));
+      document.getElementById("review-text").value = "";
+      currentRating = 0;
+      stars.forEach(s => s.classList.remove("selected"));
+      renderReviews();
+    });
+
+    // ✅ Render Review List
+    function renderReviews() {
+      const reviews = JSON.parse(localStorage.getItem(`${product.name}_reviews`)) || [];
+      const reviewsList = document.getElementById("reviews-list");
+      reviewsList.innerHTML = "<h4>User Reviews:</h4>";
+      if (reviews.length === 0) {
+        reviewsList.innerHTML += "<p>No reviews yet.</p>";
+      } else {
+        reviews.forEach(r => {
+          reviewsList.innerHTML += `<div class="review">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}<br>${r.comment}</div>`;
+        });
+      }
+    }
+
+    renderReviews();
+
+    // ✅ Click on Related Product
+    setTimeout(() => {
+      const relatedItems = document.querySelectorAll('.related-item');
+      relatedItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const index = parseInt(item.getAttribute("data-index"));
+          const clickedProduct = allProducts[index];
+          localStorage.setItem('selectedProduct', JSON.stringify(clickedProduct));
+          window.location.href = 'productdetails.html';
+        });
+      });
+    }, 0);
+
+  } else {
+    container.innerHTML = '<p>No product found. Please go back to <a href="shop.html">shop</a>.</p>';
+  }
+</script>
+</body>
+</html>
